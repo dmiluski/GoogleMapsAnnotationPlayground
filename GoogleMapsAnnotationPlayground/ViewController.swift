@@ -6,15 +6,18 @@ class ViewController: UIViewController {
   // MARK: - Models
 
   let sydney = CLLocationCoordinate2D(latitude: -33.86, longitude: 151.20)
-  var provider = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].makeIterator()
+  var provider = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].makeIterator()
 
 
   // MARK: - View
 
-  let iconView: AnnotationView = {
-    let state = AnnotationView.State.name("Ralph")
-    return AnnotationView(state)
+  lazy var iconView: AnnotationView = {
+    return AnnotationView(makeNextContent())
   }()
+
+  func makeNextContent() -> AnnotationView.State {
+    return provider.next().flatMap { .identifier( String($0) ) } ?? .name("Empty")
+  }
 
   lazy var mapView: GMSMapView = {
 
@@ -35,9 +38,9 @@ class ViewController: UIViewController {
 
     marker.iconView = iconView
 
-    // Anchor to center of marker
-    marker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
+    // Anchor to bottom of marker
     marker.appearAnimation = .pop
+
     return marker
   }()
 
@@ -111,21 +114,23 @@ class ViewController: UIViewController {
   }
 
   func addMarker(_ marker: GMSMarker) {
-    // Set outside for cleaner animations
-    marker.tracksViewChanges = true
+
+    // Must occur outside of the animation block to receive SDK appear animation treatment
     marker.map = self.mapView
 
+    // Set outside for cleaner animations
+    marker.tracksViewChanges = true
+
+    let state = makeNextContent()
+    self.iconView.state = state
     UIView.animate(
       withDuration: 0.2,
       delay: 0.0,
       options: [
-//        .layoutSubviews,
+        .layoutSubviews,
         .beginFromCurrentState,
       ],
       animations: {
-        let identifier = self.provider.next().flatMap(String.init)
-        let state: AnnotationView.State = identifier.flatMap { .identifier($0) } ?? .name("Empty")
-        self.iconView.state = state
         self.iconView.frame.size = self.iconView.intrinsicContentSize
       },
       completion: { completed in
@@ -141,7 +146,7 @@ class ViewController: UIViewController {
       withDuration: 0.2,
       delay: 0.0,
       options: [
-//        .layoutSubviews,
+        .layoutSubviews,
         .beginFromCurrentState,
       ],
       animations: {
