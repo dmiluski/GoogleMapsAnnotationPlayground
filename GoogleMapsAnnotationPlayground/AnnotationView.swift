@@ -5,35 +5,29 @@ import UIKit
 /// - Note: Hacked together sizing to provide demonstration of functionality
 class AnnotationView: UIView {
 
-  enum State {
-    case identifier(String)
-    case name(String)
-    case mini
+  // MARK: - Types
+  struct State {
 
-    var value: String {
-      switch self {
-      case let .identifier(value):
-        return value
-      case let .name(value):
-        return value
-      case .mini:
-        return ""
-      }
+    /// Variants
+    enum Size {
+      case expanded
+      case compact
     }
 
+    var name: String
+    var size: Size
+
     var isLabelHidden: Bool {
-      switch self {
-      case .identifier, .name:
-        return false
-      case .mini:
-        return true
+      switch size {
+      case .compact: return true
+      case .expanded: return false
       }
     }
   }
 
-  var state: State = .identifier("1") {
+  var state: State = State(name: "Default", size: .expanded) {
     didSet {
-      label.text = state.value
+      label.text = state.name
       label.isHidden = state.isLabelHidden
       invalidateIntrinsicContentSize()
     }
@@ -43,7 +37,7 @@ class AnnotationView: UIView {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.numberOfLines = 1
-    label.text = state.value
+    label.text = state.name
     label.adjustsFontSizeToFitWidth = true
     label.minimumScaleFactor = 0.6
     label.textAlignment = .center
@@ -77,8 +71,8 @@ class AnnotationView: UIView {
 
   override var intrinsicContentSize: CGSize {
 
-    switch state {
-    case .name, .identifier:
+    switch state.size {
+    case .expanded:
       // Hack, consider other ways to provide sizing
       let size = label.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
       let padded = CGSize(
@@ -86,7 +80,7 @@ class AnnotationView: UIView {
         height: size.height + layoutMargins.top + layoutMargins.bottom
       )
       return padded
-    case .mini:
+    case .compact:
       return CGSize(width: 12.0, height: 12.0)
     }
   }

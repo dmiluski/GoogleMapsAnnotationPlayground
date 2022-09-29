@@ -9,14 +9,12 @@ class ViewController: UIViewController {
   var provider = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].makeIterator()
 
 
-  // MARK: - View
+  // MARK: - Views
 
-  lazy var iconView: AnnotationView = {
-    return AnnotationView(makeNextContent())
-  }()
+  lazy var iconView: AnnotationView = AnnotationView(.init(name: "InitialValue", size: .expanded))
 
-  func makeNextContent() -> AnnotationView.State {
-    return provider.next().flatMap { .identifier( String($0) ) } ?? .name("Empty")
+  func makeNextName() -> String {
+    provider.next().flatMap(String.init) ?? "EOL"
   }
 
   lazy var mapView: GMSMapView = {
@@ -64,10 +62,10 @@ class ViewController: UIViewController {
     return button
   }()
 
-  lazy var shrinkButton: UIButton = {
-    let action = UIAction(title: "Shrink") { [weak self] _ in
+  lazy var resizeButton: UIButton = {
+    let action = UIAction(title: "Resize") { [weak self] _ in
       guard let self = self else { return }
-      self.shrinkMarker(self.sydneyMarker)
+      self.resizeMarker(self.sydneyMarker)
     }
     let button = UIButton(type: .system, primaryAction: action)
     button.translatesAutoresizingMaskIntoConstraints = false
@@ -97,10 +95,10 @@ class ViewController: UIViewController {
       removeButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
     ])
 
-    view.addSubview(shrinkButton)
+    view.addSubview(resizeButton)
     NSLayoutConstraint.activate([
-      shrinkButton.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor),
-      shrinkButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+      resizeButton.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor),
+      resizeButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
     ])
 
     view.addSubview(addButton)
@@ -112,6 +110,11 @@ class ViewController: UIViewController {
     let camera = GMSCameraPosition(target: sydney, zoom: 6.0)
     mapView.animate(to: camera)
   }
+}
+
+// MARK: - Actions
+
+extension ViewController {
 
   func addMarker(_ marker: GMSMarker) {
 
@@ -121,8 +124,7 @@ class ViewController: UIViewController {
     // Set outside for cleaner animations
     marker.tracksViewChanges = true
 
-    let state = makeNextContent()
-    self.iconView.state = state
+    self.iconView.state = AnnotationView.State(name: makeNextName(), size: .expanded)
     UIView.animate(
       withDuration: 0.2,
       delay: 0.0,
@@ -138,9 +140,13 @@ class ViewController: UIViewController {
       })
   }
 
-  func shrinkMarker(_ marker: GMSMarker) {
+  func updateContent(_ marker: GMSMarker) {
+
     // Set outside for cleaner animations
     marker.tracksViewChanges = true
+
+    // Update Model
+    iconView.state.name = provider.next().flatMap(String.init) ?? "EOL"
 
     UIView.animate(
       withDuration: 0.2,
@@ -150,7 +156,41 @@ class ViewController: UIViewController {
         .beginFromCurrentState,
       ],
       animations: {
-        self.iconView.frame.size = CGSize(width: 12, height: 12)
+        self.iconView.frame.size = self.iconView.intrinsicContentSize
+      },
+      completion: { completed in
+        marker.tracksViewChanges = false
+      })
+  }
+
+  func resizeMarker(_ marker: GMSMarker) {
+
+    // Set outside for cleaner animations
+    marker.tracksViewChanges = true
+
+    let newSize: AnnotationView.State.Size = {
+      switch iconView.state.size {
+      case .expanded: return .compact
+      case .compact: return .expanded
+      }
+    }()
+
+    iconView.state.size = newSize
+
+    UIView.animate(
+      withDuration: 0.2,
+      delay: 0.0,
+      options: [
+        .layoutSubviews,
+        .beginFromCurrentState,
+      ],
+      animations: {
+        switch newSize {
+        case .compact:
+          self.iconView.frame.size = CGSize(width: 12, height: 12)
+        case .expanded:
+          self.iconView.frame.size = self.iconView.intrinsicContentSize
+        }
       },
       completion: { completed in
         marker.tracksViewChanges = false
@@ -160,5 +200,6 @@ class ViewController: UIViewController {
   func removeMarker(_ marker: GMSMarker) {
     marker.map = nil
   }
+
 }
 
