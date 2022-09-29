@@ -48,7 +48,6 @@ class ViewController: UIViewController {
       self.addMarker(self.sydneyMarker)
     }
     let button = UIButton(type: .system, primaryAction: action)
-    button.translatesAutoresizingMaskIntoConstraints = false
     return button
   }()
 
@@ -58,7 +57,6 @@ class ViewController: UIViewController {
       self.removeMarker(self.sydneyMarker)
     }
     let button = UIButton(type: .system, primaryAction: action)
-    button.translatesAutoresizingMaskIntoConstraints = false
     return button
   }()
 
@@ -68,8 +66,32 @@ class ViewController: UIViewController {
       self.resizeMarker(self.sydneyMarker)
     }
     let button = UIButton(type: .system, primaryAction: action)
-    button.translatesAutoresizingMaskIntoConstraints = false
     return button
+  }()
+
+  /// Changes Contents
+  lazy var changeButton: UIButton = {
+    let action = UIAction(title: "Update") { [weak self] _ in
+      guard let self = self else { return }
+      self.updateContent(self.sydneyMarker)
+    }
+    let button = UIButton(type: .system, primaryAction: action)
+    return button
+  }()
+
+  /// Contains Buttons
+  lazy var controls: UIView = {
+    let stackView = UIStackView(arrangedSubviews: [
+      resizeButton,
+      changeButton,
+      addButton,
+      removeButton,
+    ])
+    stackView.axis = .horizontal
+    stackView.distribution = .fillEqually
+
+    stackView.translatesAutoresizingMaskIntoConstraints = false
+    return stackView
   }()
 
 
@@ -89,22 +111,11 @@ class ViewController: UIViewController {
       mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    view.addSubview(removeButton)
+    view.addSubview(controls)
     NSLayoutConstraint.activate([
-      removeButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-      removeButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
-    ])
-
-    view.addSubview(resizeButton)
-    NSLayoutConstraint.activate([
-      resizeButton.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor),
-      resizeButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
-    ])
-
-    view.addSubview(addButton)
-    NSLayoutConstraint.activate([
-      addButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-      addButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+      controls.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+      controls.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+      controls.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
     ])
 
     let camera = GMSCameraPosition(target: sydney, zoom: 6.0)
@@ -122,22 +133,24 @@ extension ViewController {
     marker.map = self.mapView
 
     // Set outside for cleaner animations
-    marker.tracksViewChanges = true
+//    marker.tracksViewChanges = true
+//    self.iconView.frame.size = self.iconView.intrinsicContentSize
 
-    self.iconView.state = AnnotationView.State(name: makeNextName(), size: .expanded)
-    UIView.animate(
-      withDuration: 0.2,
-      delay: 0.0,
-      options: [
-        .layoutSubviews,
-        .beginFromCurrentState,
-      ],
-      animations: {
-        self.iconView.frame.size = self.iconView.intrinsicContentSize
-      },
-      completion: { completed in
-        marker.tracksViewChanges = false
-      })
+//    self.iconView.state = AnnotationView.State(name: makeNextName(), size: .expanded)
+    self.iconView.frame.size = self.iconView.intrinsicContentSize
+//    UIView.animate(
+//      withDuration: 0.2,
+//      delay: 0.0,
+//      options: [
+//        .layoutSubviews,
+//        .beginFromCurrentState,
+//      ],
+//      animations: {
+////        self.iconView.frame.size = self.iconView.intrinsicContentSize
+//      },
+//      completion: { completed in
+//        marker.tracksViewChanges = false
+//      })
   }
 
   func updateContent(_ marker: GMSMarker) {

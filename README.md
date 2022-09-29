@@ -18,4 +18,4 @@ Follow xcFramework [Manual setup instructions](https://developers.google.com/map
 
 | Demo |
 | --- |
-| ![MockMinipinDemo](https://media.git.musta.ch/user/8819/files/71dfe32e-d46c-4aad-9fe2-704e0301a00b) |
+| ![MockMinipinDemo](![MockMinipinDemo](https://media.git.musta.ch/user/8819/files/23851e14-e3af-44dd-b476-85e83b5e6996) |
