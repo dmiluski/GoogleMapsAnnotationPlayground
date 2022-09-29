@@ -9,10 +9,10 @@ Follow xcFramework [Manual setup instructions](https://developers.google.com/map
 1. Download SDK Source files: [GoogleMaps-7.1.0-beta](https://dl.google.com/geosdk/GoogleMaps-7.1.0-beta.tar.gz)
 2. Drag the following XCFrameworks into the "Frameworks" folder in the ProjectDirectory
 
-- ProjectDir/Frameworks/GoogleMapsBase.xcframework
-- ProjectDir/Frameworks/GoogleMaps.xcframework
-- ProjectDir/Frameworks/GoogleMapsCore.xcframework
-- (Premium Plan customers only) GoogleMaps-x.x.x/GoogleMapsM4B.xcframework
+    - ProjectDir/Frameworks/GoogleMapsBase.xcframework
+    - ProjectDir/Frameworks/GoogleMaps.xcframework
+    - ProjectDir/Frameworks/GoogleMapsCore.xcframework
+    - (Premium Plan customers only) GoogleMaps-x.x.x/GoogleMapsM4B.xcframework
 
 ## Example usage
 
