@@ -1,5 +1,6 @@
-# GoogleMapsSDKMinipinDemo
-Demonstration of potential approach for animating pins from mini-pin to expanded state
+# GoogleMapsSDK Marker Transitions Demo
+
+Demonstration of potential approach for animating pins between states
 
 ## Setup
 
@@ -18,4 +19,4 @@ Follow xcFramework [Manual setup instructions](https://developers.google.com/map
 
 | Demo |
 | --- |
-| ![MockMinipinDemo](![MockMinipinDemo](https://media.git.musta.ch/user/8819/files/23851e14-e3af-44dd-b476-85e83b5e6996) |
+| ![MockMarkerTransitionDemo](https://media.git.musta.ch/user/8819/files/23851e14-e3af-44dd-b476-85e83b5e6996) |
