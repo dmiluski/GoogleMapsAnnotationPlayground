@@ -3,7 +3,8 @@
 Demonstration of potential approach for animating pins between states
 
 ## Issue
-https://git.musta.ch/airbnb/apps/pull/178740/files#:~:text=**Google%20Issue%3A-,https%3A//issuetracker.google.com/issues/204520941%3Fpli%3D1,-Problem%3A
+
+https://issuetracker.google.com/issues/204520941?pli=1
 
 ## Setup
 
