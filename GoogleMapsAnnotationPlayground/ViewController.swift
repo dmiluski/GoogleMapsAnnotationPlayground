@@ -100,9 +100,6 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    GMSServices.provideAPIKey("YOUR_API_KEY")
-    GMSServices.setMetalRendererEnabled(true)
-
     view.addSubview(mapView)
     NSLayoutConstraint.activate([
       mapView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
