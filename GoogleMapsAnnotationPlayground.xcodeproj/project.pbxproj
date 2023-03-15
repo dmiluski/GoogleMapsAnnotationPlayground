@@ -38,6 +38,7 @@
 		F4E8121628E4AE9400FC50E5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4E8121528E4AE9400FC50E5 /* UIKit.framework */; };
 		F4E8121B28E4B12200FC50E5 /* GoogleMaps.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F4E8121A28E4B12200FC50E5 /* GoogleMaps.bundle */; };
 		F4E8121D28E4B2BD00FC50E5 /* AnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E8121C28E4B2BD00FC50E5 /* AnnotationView.swift */; };
+		F4EC30E029C1397400054FDB /* UpdatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EC30DF29C1397400054FDB /* UpdatingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +94,7 @@
 		F4E8121528E4AE9400FC50E5 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		F4E8121A28E4B12200FC50E5 /* GoogleMaps.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = GoogleMaps.bundle; path = "Frameworks/GoogleMaps.xcframework/ios-arm64_x86_64-simulator/GoogleMaps.framework/Resources/GoogleMaps.bundle"; sourceTree = SOURCE_ROOT; };
 		F4E8121C28E4B2BD00FC50E5 /* AnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationView.swift; sourceTree = "<group>"; };
+		F4EC30DF29C1397400054FDB /* UpdatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,6 +170,7 @@
 				F4E811B628E4ABD200FC50E5 /* AppDelegate.swift */,
 				F4E811B828E4ABD200FC50E5 /* SceneDelegate.swift */,
 				F4E811BA28E4ABD200FC50E5 /* ViewController.swift */,
+				F4EC30DF29C1397400054FDB /* UpdatingView.swift */,
 				F4E8121C28E4B2BD00FC50E5 /* AnnotationView.swift */,
 				F4E811BC28E4ABD200FC50E5 /* Main.storyboard */,
 				F4E811BF28E4ABD300FC50E5 /* Assets.xcassets */,
@@ -362,6 +365,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4E811BB28E4ABD200FC50E5 /* ViewController.swift in Sources */,
+				F4EC30E029C1397400054FDB /* UpdatingView.swift in Sources */,
 				F4E8121D28E4B2BD00FC50E5 /* AnnotationView.swift in Sources */,
 				F4E811B728E4ABD200FC50E5 /* AppDelegate.swift in Sources */,
 				F4E811B928E4ABD200FC50E5 /* SceneDelegate.swift in Sources */,

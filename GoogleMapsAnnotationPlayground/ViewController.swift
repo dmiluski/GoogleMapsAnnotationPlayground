@@ -12,6 +12,7 @@ class ViewController: UIViewController {
   // MARK: - Views
 
   lazy var iconView: AnnotationView = AnnotationView(.init(name: "InitialValue", size: .expanded))
+  lazy var updatingView = UpdatingView()
 
   func makeNextName() -> String {
     provider.next().flatMap(String.init) ?? "EOL"
@@ -42,6 +43,21 @@ class ViewController: UIViewController {
     return marker
   }()
 
+  lazy var DubboMarker: GMSMarker = {
+    // Creates a marker in the center of the map.
+    let marker = GMSMarker()
+    marker.position = CLLocationCoordinate2D(latitude: -32.2444, longitude: 148.6144)
+    marker.title = "Dubbo"
+    marker.snippet = "Australia"
+
+    marker.iconView = updatingView
+
+    // Anchor to bottom of marker
+    marker.appearAnimation = .pop
+
+    return marker
+  }()
+
   lazy var addButton: UIButton = {
     let action = UIAction(title: "Add") { [weak self] _ in
       guard let self = self else { return }
@@ -63,7 +79,7 @@ class ViewController: UIViewController {
   lazy var resizeButton: UIButton = {
     let action = UIAction(title: "Resize") { [weak self] _ in
       guard let self = self else { return }
-      self.resizeMarker(self.sydneyMarker)
+      self.resizeSydneyMarker(self.sydneyMarker)
     }
     let button = UIButton(type: .system, primaryAction: action)
     return button
@@ -73,7 +89,25 @@ class ViewController: UIViewController {
   lazy var changeButton: UIButton = {
     let action = UIAction(title: "Update") { [weak self] _ in
       guard let self = self else { return }
-      self.updateContent(self.sydneyMarker)
+      self.updateSydneyContent(self.sydneyMarker)
+    }
+    let button = UIButton(type: .system, primaryAction: action)
+    return button
+  }()
+
+  lazy var addColorChangingView: UIButton = {
+    let action = UIAction(title: "Add") { [weak self] _ in
+      guard let self = self else { return }
+      self.addMarker(self.DubboMarker)
+    }
+    let button = UIButton(type: .system, primaryAction: action)
+    return button
+  }()
+
+  lazy var toggleColorChangingView: UIButton = {
+    let action = UIAction(title: "Update") { [weak self] _ in
+      guard let self = self else { return }
+      self.updateDubboContent(self.DubboMarker)
     }
     let button = UIButton(type: .system, primaryAction: action)
     return button
@@ -90,6 +124,16 @@ class ViewController: UIViewController {
     stackView.axis = .horizontal
     stackView.distribution = .fillEqually
 
+    stackView.translatesAutoresizingMaskIntoConstraints = false
+    return stackView
+  }()
+
+  lazy var updatingViewControls: UIView = {
+
+    let stackView = UIStackView(arrangedSubviews: [UIView(), addColorChangingView, toggleColorChangingView])
+    stackView.axis = .horizontal
+    stackView.distribution = .fill
+    stackView.spacing = 20
     stackView.translatesAutoresizingMaskIntoConstraints = false
     return stackView
   }()
@@ -115,6 +159,13 @@ class ViewController: UIViewController {
       controls.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
     ])
 
+    view.addSubview(updatingViewControls)
+    NSLayoutConstraint.activate([
+      updatingViewControls.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor),
+      updatingViewControls.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+      updatingViewControls.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+    ])
+
     let camera = GMSCameraPosition(target: sydney, zoom: 6.0)
     mapView.animate(to: camera)
   }
@@ -128,29 +179,10 @@ extension ViewController {
 
     // Must occur outside of the animation block to receive SDK appear animation treatment
     marker.map = self.mapView
-
-    // Set outside for cleaner animations
-//    marker.tracksViewChanges = true
-//    self.iconView.frame.size = self.iconView.intrinsicContentSize
-
-//    self.iconView.state = AnnotationView.State(name: makeNextName(), size: .expanded)
     self.iconView.frame.size = self.iconView.intrinsicContentSize
-//    UIView.animate(
-//      withDuration: 0.2,
-//      delay: 0.0,
-//      options: [
-//        .layoutSubviews,
-//        .beginFromCurrentState,
-//      ],
-//      animations: {
-////        self.iconView.frame.size = self.iconView.intrinsicContentSize
-//      },
-//      completion: { completed in
-//        marker.tracksViewChanges = false
-//      })
   }
 
-  func updateContent(_ marker: GMSMarker) {
+  func updateSydneyContent(_ marker: GMSMarker) {
 
     // Set outside for cleaner animations
     marker.tracksViewChanges = true
@@ -173,7 +205,24 @@ extension ViewController {
       })
   }
 
-  func resizeMarker(_ marker: GMSMarker) {
+  func updateDubboContent(_ marker: GMSMarker) {
+    // Set outside for cleaner animations
+    marker.tracksViewChanges = true
+
+    // Update Model
+    UIView.animate(
+      withDuration: 0.2,
+      delay: 0.0,
+      options: [],
+      animations: {
+        self.updatingView.toggleColor()
+      },
+      completion: { completed in
+        marker.tracksViewChanges = false
+      })
+  }
+
+  func resizeSydneyMarker(_ marker: GMSMarker) {
 
     // Set outside for cleaner animations
     marker.tracksViewChanges = true
