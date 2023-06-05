@@ -11,7 +11,7 @@ https://issuetracker.google.com/issues/204520941?pli=1
 Due to lack of SPM support, the easiest setup method involves installing
 Follow xcFramework [Manual setup instructions](https://developers.google.com/maps/documentation/ios-sdk/config#install-the-xcframework)
 
-1. Download SDK Source files: [GoogleMaps-7.4.0](https://dl.google.com/geosdk/12cdf90d54d85bfcc90d340148d86362ee3189ea24b4bd20ca891e9bd33ded21/GoogleMaps-7.4.0.tar.gz)
+1. Download SDK Source files: [GoogleMaps-8.0.0](https://dl.google.com/geosdk/2852f627534936c2fae7c11d69fd5a026813a66dd6ca555d751d14ae6cd1256e/GoogleMaps-8.0.0.tar.gz)
 2. Drag the following XCFrameworks into the "Frameworks" folder in the ProjectDirectory
 
     - ProjectDir/Frameworks/GoogleMapsBase.xcframework
