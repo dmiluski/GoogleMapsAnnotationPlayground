@@ -5,6 +5,20 @@ import UIKit
 
 class UpdatingView: UIView {
 
+  struct Content {
+    var state: State
+    var value: Int
+
+    mutating func toggleColor() {
+      switch state {
+      case .purple:
+        state = .red
+      case .red:
+        state = .purple
+      }
+    }
+  }
+
   enum State {
     case red
     case purple
@@ -19,16 +33,27 @@ class UpdatingView: UIView {
     }
   }
 
-  var state: State = .red {
-    didSet {
-      backgroundColor = state.color
-    }
+  func setContent(_ content: Content) {
+    backgroundColor = content.state.color
+    label.text = "\(content.value)"
+    invalidateIntrinsicContentSize()
   }
 
   init() {
-    super.init(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
+    super.init(frame: .zero)
+    translatesAutoresizingMaskIntoConstraints = false
     setup()
   }
+
+  private lazy var label: UILabel = {
+    let label = UILabel()
+    label.font = UIFont.systemFont(ofSize: 50)
+    label.setContentCompressionResistancePriority(.required, for: .horizontal)
+    label.setContentCompressionResistancePriority(.required, for: .vertical)
+
+    label.translatesAutoresizingMaskIntoConstraints = false
+    return label
+  }()
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
@@ -36,21 +61,15 @@ class UpdatingView: UIView {
   }
 
   func setup() {
-    backgroundColor = state.color
+    backgroundColor = .red
+    label.text = "0"
+    addSubview(label)
+
+    NSLayoutConstraint.activate([
+      label.leadingAnchor.constraint(equalTo: leadingAnchor),
+      label.trailingAnchor.constraint(equalTo: trailingAnchor),
+      label.topAnchor.constraint(equalTo: topAnchor),
+      label.bottomAnchor.constraint(equalTo: bottomAnchor),
+    ])
   }
-
-  override var intrinsicContentSize: CGSize {
-    return CGSize(width: 44, height: 44)
-  }
-
-  func toggleColor() {
-    switch state {
-    case .purple:
-      state = .red
-    case .red:
-      state = .purple
-    }
-  }
-
-
 }

@@ -215,11 +215,17 @@ extension ViewController {
       delay: 0.0,
       options: [],
       animations: {
-        self.updatingView.toggleColor()
+        self.updateContent()
+        self.updatingView.setContent(self.content)
       },
       completion: { completed in
         marker.tracksViewChanges = false
       })
+  }
+
+  func updateContent() {
+    content.toggleColor()
+    content.value += 1
   }
 
   func resizeSydneyMarker(_ marker: GMSMarker) {
