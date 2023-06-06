@@ -2,9 +2,22 @@
 
 Demonstration of potential approach for animating pins between states
 
-## Issue
+## Solved Issue (As of v8.0.0)
 
-https://issuetracker.google.com/issues/204520941?pli=1
+- [x] https://issuetracker.google.com/issues/204520941?pli=1
+
+## Observed Issue (As of v8.0.0)
+
+Changing zIndex results in blink update similar to reported issue above
+- [ ] https://issuetracker.google.com/issues/285843951
+
+| Demo |
+| --- |
+| ![GooglezIndexDemo](https://github.com/dmiluski/GoogleMapsAnnotationPlayground/assets/5083390/d49718e3-b578-4771-b66b-e7264350e262) |
+
+Raw Video
+https://github.com/dmiluski/GoogleMapsAnnotationPlayground/assets/5083390/4a231a38-292d-404d-8616-19cd0b27c00a
+
 
 ## Setup
 
@@ -21,7 +34,7 @@ Follow xcFramework [Manual setup instructions](https://developers.google.com/map
     
 3. Set your API key [here](https://github.com/dmiluski/GoogleMapsAnnotationPlayground/blob/sharableDemo/GoogleMapsAnnotationPlayground/ViewController.swift#L22)
 
-## Example usage
+## Earlier Example usage
 
 | Using a simpler case and only chancing color |
 | --- |
