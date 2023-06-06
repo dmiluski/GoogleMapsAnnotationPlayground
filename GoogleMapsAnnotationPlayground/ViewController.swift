@@ -13,6 +13,7 @@ class ViewController: UIViewController {
 
   lazy var iconView: AnnotationView = AnnotationView(.init(name: "InitialValue", size: .expanded))
   lazy var updatingView = UpdatingView()
+  var content = UpdatingView.Content()
 
   func makeNextName() -> String {
     provider.next().flatMap(String.init) ?? "EOL"
@@ -217,6 +218,10 @@ extension ViewController {
       animations: {
         self.updateContent()
         self.updatingView.setContent(self.content)
+
+        // Change the zIndex
+        // Eg. Demonstrates potential to raise zIndexes on selection
+        self.DubboMarker.zIndex = Int32(self.content.value)
       },
       completion: { completed in
         marker.tracksViewChanges = false

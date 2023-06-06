@@ -6,8 +6,8 @@ import UIKit
 class UpdatingView: UIView {
 
   struct Content {
-    var state: State
-    var value: Int
+    var state: State = .red
+    var value: Int = 0
 
     mutating func toggleColor() {
       switch state {
