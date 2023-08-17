@@ -36,7 +36,6 @@ class UpdatingView: UIView {
   func setContent(_ content: Content) {
     backgroundColor = content.state.color
     label.text = "\(content.value)"
-    invalidateIntrinsicContentSize()
   }
 
   init() {
@@ -50,7 +49,6 @@ class UpdatingView: UIView {
     label.font = UIFont.systemFont(ofSize: 50)
     label.setContentCompressionResistancePriority(.required, for: .horizontal)
     label.setContentCompressionResistancePriority(.required, for: .vertical)
-
     label.translatesAutoresizingMaskIntoConstraints = false
     return label
   }()
