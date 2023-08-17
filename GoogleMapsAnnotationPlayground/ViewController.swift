@@ -301,6 +301,9 @@ extension ViewController {
   private func demoUpdatingViewContentUpdateWithUIViewAnimation(_ marker: GMSAdvancedMarker) {
     marker.tracksViewChanges = true
 
+    // Update Model
+    self.updateContent()
+
     UIView.animate(
       withDuration: 0.2,
       delay: 0.0,
