@@ -207,30 +207,42 @@ extension ViewController {
   }
 
   func updateDubboContent(_ marker: GMSMarker) {
-    // Set outside for cleaner animations
+
+    print("Dane - typeOf: \(type(of: marker))")
+    // Dane - Here
     marker.tracksViewChanges = true
+    updateContent()
+    updatingView.setContent(self.content)
+    marker.zIndex += 1
+    marker.tracksViewChanges = false
 
-    // Update Model
-    UIView.animate(
-      withDuration: 0.2,
-      delay: 0.0,
-      options: [],
-      animations: {
-        self.updateContent()
-        self.updatingView.setContent(self.content)
 
-        // Change the zIndex
-        // Eg. Demonstrates potential to raise zIndexes on selection
-        self.DubboMarker.zIndex = Int32(self.content.value)
-      },
-      completion: { completed in
-        marker.tracksViewChanges = false
-      })
+    //    // Set outside for cleaner animations
+//    marker.tracksViewChanges = true
+//
+//    // Update Model
+//    UIView.animate(
+//      withDuration: 0.2,
+//      delay: 0.0,
+//      options: [],
+//      animations: {
+//        self.updateContent()
+//        self.updatingView.setContent(self.content)
+//
+//        // Change the zIndex
+//        // Eg. Demonstrates potential to raise zIndexes on selection
+//        self.DubboMarker.zIndex = Int32(self.content.value)
+//      },
+//      completion: { completed in
+//        marker.tracksViewChanges = false
+//      })
+    
+//    self.DubboMarker.zIndex = Int32(self.content.value)
   }
 
   func updateContent() {
     content.toggleColor()
-    content.value += 1
+//    content.value += 1
   }
 
   func resizeSydneyMarker(_ marker: GMSMarker) {
