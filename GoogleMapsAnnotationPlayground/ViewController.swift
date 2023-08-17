@@ -3,6 +3,17 @@ import GoogleMaps
 
 class ViewController: UIViewController {
 
+
+
+  enum Option {
+    case flipTracksViewChangesNoAnimation
+    case updateWithoutAnimation
+    case updateWithViewPropertyAnimation
+    case updateWithViewAnimation
+  }
+
+  var testOption: Option = .flipTracksViewChangesNoAnimation
+
   // MARK: - Models
 
   let sydney = CLLocationCoordinate2D(latitude: -33.86, longitude: 151.20)
@@ -11,6 +22,25 @@ class ViewController: UIViewController {
 
   // MARK: - Views
 
+  lazy var segmentedControl: UISegmentedControl = {
+    let actions = [
+      UIAction(title: "Flip") { [weak self] _ in
+        self?.testOption = .flipTracksViewChangesNoAnimation
+      },
+      UIAction(title: "NonAnim") { [weak self] _ in
+        self?.testOption = .updateWithoutAnimation
+      },
+      UIAction(title: "PropertyAnim") { [weak self] _ in
+        self?.testOption = .updateWithViewPropertyAnimation
+      },
+      UIAction(title: "UIViewAnim") { [weak self] _ in
+        self?.testOption = .updateWithViewAnimation
+      },
+    ]
+    let control = UISegmentedControl(frame: .zero, actions: actions)
+    control.translatesAutoresizingMaskIntoConstraints = false
+    return control
+  }()
   lazy var iconView: AnnotationView = AnnotationView(.init(name: "InitialValue", size: .expanded))
   lazy var updatingView = UpdatingView()
   var content = UpdatingView.Content()
@@ -44,10 +74,12 @@ class ViewController: UIViewController {
     return marker
   }()
 
-  lazy var DubboMarker: GMSMarker = {
+  // Marker holding updatingView as iconView
+  lazy var updatingMarker: GMSMarker = {
     // Creates a marker in the center of the map.
     let marker = GMSMarker()
     marker.position = CLLocationCoordinate2D(latitude: -32.2444, longitude: 148.6144)
+    marker.groundAnchor = .init(x: 0.5, y: 0.5)
     marker.title = "Dubbo"
     marker.snippet = "Australia"
 
@@ -99,7 +131,7 @@ class ViewController: UIViewController {
   lazy var addColorChangingView: UIButton = {
     let action = UIAction(title: "Add") { [weak self] _ in
       guard let self = self else { return }
-      self.addMarker(self.DubboMarker)
+      self.addMarker(self.updatingMarker)
     }
     let button = UIButton(type: .system, primaryAction: action)
     return button
@@ -108,7 +140,7 @@ class ViewController: UIViewController {
   lazy var toggleColorChangingView: UIButton = {
     let action = UIAction(title: "Update") { [weak self] _ in
       guard let self = self else { return }
-      self.updateDubboContent(self.DubboMarker)
+      self.updateDubboContent(self.updatingMarker)
     }
     let button = UIButton(type: .system, primaryAction: action)
     return button
@@ -167,6 +199,14 @@ class ViewController: UIViewController {
       updatingViewControls.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
     ])
 
+    view.addSubview(segmentedControl)
+    segmentedControl.selectedSegmentIndex = 0
+    NSLayoutConstraint.activate([
+      segmentedControl.bottomAnchor.constraint(equalTo: updatingViewControls.topAnchor, constant: -8),
+      segmentedControl.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+      segmentedControl.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+    ])
+
     let camera = GMSCameraPosition(target: sydney, zoom: 6.0)
     mapView.animate(to: camera)
   }
@@ -206,43 +246,102 @@ extension ViewController {
       })
   }
 
-  func updateDubboContent(_ marker: GMSMarker) {
-
-    print("Dane - typeOf: \(type(of: marker))")
-    // Dane - Here
+  // Easily Repro Flicker given GMSMarker (Legacy)
+  private func demoUpdatingViewFlicker(_ marker: GMSMarker) {
+    // If using GMSMarker (Not Advanced Marker), this triggers the flicker every time
     marker.tracksViewChanges = true
+    marker.tracksViewChanges = false
+  }
+
+  // Change content, but no animation
+  private func demoUpdatingViewContentUpdateNoAnimation(_ marker: GMSMarker) {
+    marker.tracksViewChanges = true
+
+    // Update Model, Apply model to view
     updateContent()
     updatingView.setContent(self.content)
+    updatingView.layoutIfNeeded()
+
+    // Tweak marker properties to better align with App updates.
+    // If any of these values are touched, the Marker's iconView flickers
     marker.zIndex += 1
+    marker.title = (marker.title ?? "") + " "
     marker.tracksViewChanges = false
+  }
+
+  // Change content, but no animation
+  private func demoUpdatingViewContentUpdateWithViewPropertyAnimation(_ marker: GMSMarker) {
+    marker.tracksViewChanges = true
+
+    let curve = UICubicTimingParameters(controlPoint1: .init(x: 0.2, y: 0), controlPoint2: .init(x: 0, y: 1))
+    let animator = UIViewPropertyAnimator(duration: 0.2, timingParameters: curve)
+
+    // Update Model
+    self.updateContent()
+
+    animator.addAnimations {
+      // Apply model to view
+      self.updatingView.setContent(self.content)
+      self.updatingView.layoutIfNeeded()
+    }
+    animator.addCompletion { _ in
+      marker.tracksViewChanges = false
+    }
+
+    // Tweak marker properties to better align with App updates.
+    // Should this be inside or outside animation?
+    // If any of these values are touched, the Marker's iconView flickers
+    // If these are not touched, the marker does Not flicker
+    marker.zIndex += 1
+    marker.title = (marker.title ?? "") + " "
+    marker.groundAnchor = .init(x: 0.5, y: 0.5)
+
+    animator.startAnimation()
+  }
+
+  private func demoUpdatingViewContentUpdateWithUIViewAnimation(_ marker: GMSMarker) {
+    marker.tracksViewChanges = true
+
+    self.updateContent()
+    UIView.animate(
+      withDuration: 0.2,
+      delay: 0.0,
+      options: [],
+      animations: {
+        self.updatingView.setContent(self.content)
+        self.updatingView.layoutIfNeeded()
+      },
+      completion: { completed in
+        marker.tracksViewChanges = false
+      })
+
+    // Tweak marker properties to better align with App updates.
+    // Should this be inside or outside animation?
+    // If these are not touched, the marker does Not flicker
+    marker.zIndex += 1
+    marker.title = (marker.title ?? "") + " "
+    marker.groundAnchor = .init(x: 0.5, y: 0.5)
+  }
 
 
-    //    // Set outside for cleaner animations
-//    marker.tracksViewChanges = true
-//
-//    // Update Model
-//    UIView.animate(
-//      withDuration: 0.2,
-//      delay: 0.0,
-//      options: [],
-//      animations: {
-//        self.updateContent()
-//        self.updatingView.setContent(self.content)
-//
-//        // Change the zIndex
-//        // Eg. Demonstrates potential to raise zIndexes on selection
-//        self.DubboMarker.zIndex = Int32(self.content.value)
-//      },
-//      completion: { completed in
-//        marker.tracksViewChanges = false
-//      })
-    
-//    self.DubboMarker.zIndex = Int32(self.content.value)
+  // How to reproduce blink
+  func updateDubboContent(_ marker: GMSMarker) {
+
+    switch testOption {
+    case .flipTracksViewChangesNoAnimation:
+      demoUpdatingViewFlicker(marker)
+    case .updateWithoutAnimation:
+      demoUpdatingViewContentUpdateNoAnimation(marker)
+    case .updateWithViewPropertyAnimation:
+      demoUpdatingViewContentUpdateWithViewPropertyAnimation(marker)
+    case .updateWithViewAnimation:
+      demoUpdatingViewContentUpdateWithUIViewAnimation(marker)
+    }
   }
 
   func updateContent() {
     content.toggleColor()
-//    content.value += 1
+    content.value += 1
   }
 
   func resizeSydneyMarker(_ marker: GMSMarker) {
