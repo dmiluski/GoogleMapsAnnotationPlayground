@@ -53,16 +53,16 @@ class ViewController: UIViewController {
 
     GMSServices.provideAPIKey("YOUR_API_KEY")
     GMSServices.setMetalRendererEnabled(true)
-
     let mapView = GMSMapView()
     mapView.translatesAutoresizingMaskIntoConstraints = false
     return mapView
   }()
 
-  lazy var sydneyMarker: GMSMarker = {
+  lazy var sydneyMarker: GMSAdvancedMarker = {
     // Creates a marker in the center of the map.
-    let marker = GMSMarker()
+    let marker = GMSAdvancedMarker()
     marker.position = CLLocationCoordinate2D(latitude: -33.86, longitude: 151.20)
+    marker.groundAnchor = .init(x: 0.5, y: 0.5)
     marker.title = "Sydney"
     marker.snippet = "Australia"
 
@@ -75,9 +75,9 @@ class ViewController: UIViewController {
   }()
 
   // Marker holding updatingView as iconView
-  lazy var updatingMarker: GMSMarker = {
+  lazy var updatingMarker: GMSAdvancedMarker = {
     // Creates a marker in the center of the map.
-    let marker = GMSMarker()
+    let marker = GMSAdvancedMarker()
     marker.position = CLLocationCoordinate2D(latitude: -32.2444, longitude: 148.6144)
     marker.groundAnchor = .init(x: 0.5, y: 0.5)
     marker.title = "Dubbo"
@@ -95,6 +95,7 @@ class ViewController: UIViewController {
     let action = UIAction(title: "Add") { [weak self] _ in
       guard let self = self else { return }
       self.addMarker(self.sydneyMarker)
+      self.iconView.frame.size = self.iconView.intrinsicContentSize
     }
     let button = UIButton(type: .system, primaryAction: action)
     return button
@@ -216,14 +217,12 @@ class ViewController: UIViewController {
 
 extension ViewController {
 
-  func addMarker(_ marker: GMSMarker) {
-
+  func addMarker(_ marker: GMSAdvancedMarker) {
     // Must occur outside of the animation block to receive SDK appear animation treatment
     marker.map = self.mapView
-    self.iconView.frame.size = self.iconView.intrinsicContentSize
   }
 
-  func updateSydneyContent(_ marker: GMSMarker) {
+  func updateSydneyContent(_ marker: GMSAdvancedMarker) {
 
     // Set outside for cleaner animations
     marker.tracksViewChanges = true
@@ -247,14 +246,14 @@ extension ViewController {
   }
 
   // Easily Repro Flicker given GMSMarker (Legacy)
-  private func demoUpdatingViewFlicker(_ marker: GMSMarker) {
+  private func demoUpdatingViewFlicker(_ marker: GMSAdvancedMarker) {
     // If using GMSMarker (Not Advanced Marker), this triggers the flicker every time
     marker.tracksViewChanges = true
     marker.tracksViewChanges = false
   }
 
   // Change content, but no animation
-  private func demoUpdatingViewContentUpdateNoAnimation(_ marker: GMSMarker) {
+  private func demoUpdatingViewContentUpdateNoAnimation(_ marker: GMSAdvancedMarker) {
     marker.tracksViewChanges = true
 
     // Update Model, Apply model to view
@@ -264,13 +263,13 @@ extension ViewController {
 
     // Tweak marker properties to better align with App updates.
     // If any of these values are touched, the Marker's iconView flickers
-    marker.zIndex += 1
-    marker.title = (marker.title ?? "") + " "
+//    marker.zIndex += 1
+//    marker.title = (marker.title ?? "") + " "
     marker.tracksViewChanges = false
   }
 
   // Change content, but no animation
-  private func demoUpdatingViewContentUpdateWithViewPropertyAnimation(_ marker: GMSMarker) {
+  private func demoUpdatingViewContentUpdateWithViewPropertyAnimation(_ marker: GMSAdvancedMarker) {
     marker.tracksViewChanges = true
 
     let curve = UICubicTimingParameters(controlPoint1: .init(x: 0.2, y: 0), controlPoint2: .init(x: 0, y: 1))
@@ -292,17 +291,16 @@ extension ViewController {
     // Should this be inside or outside animation?
     // If any of these values are touched, the Marker's iconView flickers
     // If these are not touched, the marker does Not flicker
-    marker.zIndex += 1
-    marker.title = (marker.title ?? "") + " "
-    marker.groundAnchor = .init(x: 0.5, y: 0.5)
+//    marker.zIndex += 1
+//    marker.title = (marker.title ?? "") + " "
+//    marker.groundAnchor = .init(x: 0.5, y: 0.5)
 
     animator.startAnimation()
   }
 
-  private func demoUpdatingViewContentUpdateWithUIViewAnimation(_ marker: GMSMarker) {
+  private func demoUpdatingViewContentUpdateWithUIViewAnimation(_ marker: GMSAdvancedMarker) {
     marker.tracksViewChanges = true
 
-    self.updateContent()
     UIView.animate(
       withDuration: 0.2,
       delay: 0.0,
@@ -318,14 +316,14 @@ extension ViewController {
     // Tweak marker properties to better align with App updates.
     // Should this be inside or outside animation?
     // If these are not touched, the marker does Not flicker
-    marker.zIndex += 1
-    marker.title = (marker.title ?? "") + " "
-    marker.groundAnchor = .init(x: 0.5, y: 0.5)
+//    marker.zIndex += 1
+//    marker.title = (marker.title ?? "") + " "
+//    marker.groundAnchor = .init(x: 0.5, y: 0.5)
   }
 
 
   // How to reproduce blink
-  func updateDubboContent(_ marker: GMSMarker) {
+  func updateDubboContent(_ marker: GMSAdvancedMarker) {
 
     switch testOption {
     case .flipTracksViewChangesNoAnimation:
@@ -344,7 +342,7 @@ extension ViewController {
     content.value += 1
   }
 
-  func resizeSydneyMarker(_ marker: GMSMarker) {
+  func resizeSydneyMarker(_ marker: GMSAdvancedMarker) {
 
     // Set outside for cleaner animations
     marker.tracksViewChanges = true
@@ -378,7 +376,7 @@ extension ViewController {
       })
   }
 
-  func removeMarker(_ marker: GMSMarker) {
+  func removeMarker(_ marker: GMSAdvancedMarker) {
     marker.map = nil
   }
 
