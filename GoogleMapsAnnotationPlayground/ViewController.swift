@@ -78,6 +78,7 @@ class ViewController: UIViewController {
 //    marker.groundAnchor = .init(x: 0.5, y: 0.5)
     marker.title = "Dubbo"
     marker.snippet = "Australia"
+    marker.zIndex = 1
 
     marker.iconView = updatingView
 
@@ -94,6 +95,7 @@ class ViewController: UIViewController {
     //    marker.groundAnchor = .init(x: 0.5, y: 0.5)
     marker.title = "Sydney"
     marker.snippet = "Australia"
+    marker.zIndex = 0
 
     let view = UpdatingView()
     view.setContent(.init(state: .purple, value: -1))
@@ -108,8 +110,19 @@ class ViewController: UIViewController {
   lazy var addColorChangingView: UIButton = {
     let action = UIAction(title: "Add") { [weak self] _ in
       guard let self = self else { return }
-      self.addMarker(self.updatingMarker)
       self.addMarker(self.staticMarker)
+      self.addMarker(self.updatingMarker)
+
+    }
+    let button = UIButton(type: .system, primaryAction: action)
+    return button
+  }()
+
+  lazy var removeColorChangingView: UIButton = {
+    let action = UIAction(title: "Remove") { [weak self] _ in
+      guard let self = self else { return }
+      self.removeMarker(self.updatingMarker)
+
     }
     let button = UIButton(type: .system, primaryAction: action)
     return button
@@ -126,7 +139,7 @@ class ViewController: UIViewController {
 
   lazy var updatingViewControls: UIView = {
 
-    let stackView = UIStackView(arrangedSubviews: [UIView(), addColorChangingView, toggleColorChangingView])
+    let stackView = UIStackView(arrangedSubviews: [UIView(), addColorChangingView, removeColorChangingView, toggleColorChangingView])
     stackView.axis = .horizontal
     stackView.distribution = .fill
     stackView.spacing = 20
