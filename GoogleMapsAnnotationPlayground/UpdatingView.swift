@@ -40,7 +40,7 @@ class UpdatingView: UIView {
 
   init() {
     super.init(frame: .zero)
-    translatesAutoresizingMaskIntoConstraints = false
+//    translatesAutoresizingMaskIntoConstraints = false
     setup()
   }
 

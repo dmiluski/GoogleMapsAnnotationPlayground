@@ -63,7 +63,7 @@ class ViewController: UIViewController {
   }
 
   lazy var mapView: GMSMapView = {
-    GMSServices.provideAPIKey("YOUR_KEY")
+    GMSServices.provideAPIKey("YOUR_API_KYE")
     GMSServices.setMetalRendererEnabled(true)
     let mapView = GMSMapView()
     mapView.translatesAutoresizingMaskIntoConstraints = false
@@ -71,7 +71,7 @@ class ViewController: UIViewController {
   }()
 
   // Marker holding updatingView as iconView
-  lazy var updatingMarker: GMSAdvancedMarker = {
+  lazy var updatingMarker: GMSMarker = {
     // Creates a marker in the center of the map.
     let marker = GMSAdvancedMarker()
     marker.position = CLLocationCoordinate2D(latitude: -32.2444, longitude: 148.6144)
@@ -88,7 +88,7 @@ class ViewController: UIViewController {
     return marker
   }()
 
-  lazy var staticMarker: GMSAdvancedMarker = {
+  lazy var staticMarker: GMSMarker = {
     // Creates a marker in the center of the map.
     let marker = GMSAdvancedMarker()
     marker.position = sydney
@@ -191,25 +191,33 @@ class ViewController: UIViewController {
 
 extension ViewController {
 
-  func addMarker(_ marker: GMSAdvancedMarker) {
+  func addMarker(_ marker: GMSMarker) {
+
+    // Calculate and apply size manually
+    if let size = marker.iconView?.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize) {
+      marker.iconView?.frame.size = size
+    }
+
     // Must occur outside of the animation block to receive SDK appear animation treatment
     marker.map = self.mapView
   }
 
   // Easily Repro Flicker given GMSMarker (Legacy)
-  private func demoUpdatingViewFlicker(_ marker: GMSAdvancedMarker) {
+  private func demoUpdatingViewFlicker(_ marker: GMSMarker) {
     // If using GMSMarker (Not Advanced Marker), this triggers the flicker every time
     marker.tracksViewChanges = true
     marker.tracksViewChanges = false
   }
 
   // Change content, but no animation
-  private func demoUpdatingViewContentUpdateNoAnimation(_ marker: GMSAdvancedMarker) {
+  private func demoUpdatingViewContentUpdateNoAnimation(_ marker: GMSMarker) {
     marker.tracksViewChanges = true
 
     // Update Model, Apply model to view
     updateContent()
     updatingView.setContent(self.content)
+    // Calculate and apply size manually
+    updatingView.frame.size = self.updatingView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
     updatingView.layoutIfNeeded()
 
     // Tweak marker properties to better align with App updates.
@@ -220,7 +228,7 @@ extension ViewController {
   }
 
   // Change content, but no animation
-  private func demoUpdatingViewContentUpdateWithViewPropertyAnimation(_ marker: GMSAdvancedMarker) {
+  private func demoUpdatingViewContentUpdateWithViewPropertyAnimation(_ marker: GMSMarker) {
     marker.tracksViewChanges = true
 
     let curve = UICubicTimingParameters(controlPoint1: .init(x: 0.2, y: 0), controlPoint2: .init(x: 0, y: 1))
@@ -232,6 +240,8 @@ extension ViewController {
     animator.addAnimations {
       // Apply model to view
       self.updatingView.setContent(self.content)
+      // Calculate and apply size manually
+      self.updatingView.frame.size = self.updatingView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
       self.updatingView.layoutIfNeeded()
     }
     animator.addCompletion { _ in
@@ -249,7 +259,7 @@ extension ViewController {
     animator.startAnimation()
   }
 
-  private func demoUpdatingViewContentUpdateWithUIViewAnimation(_ marker: GMSAdvancedMarker) {
+  private func demoUpdatingViewContentUpdateWithUIViewAnimation(_ marker: GMSMarker) {
     marker.tracksViewChanges = true
 
     // Update Model
@@ -261,6 +271,8 @@ extension ViewController {
       options: [],
       animations: {
         self.updatingView.setContent(self.content)
+        // Calculate and apply size manually
+        self.updatingView.frame.size = self.updatingView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
         self.updatingView.layoutIfNeeded()
       },
       completion: { completed in
@@ -277,7 +289,7 @@ extension ViewController {
 
 
   // How to reproduce blink
-  func updateDubboContent(_ marker: GMSAdvancedMarker) {
+  func updateDubboContent(_ marker: GMSMarker) {
 
     switch testOption {
     case .flipTracksViewChangesNoAnimation:
@@ -299,7 +311,7 @@ extension ViewController {
     content.value += 1
   }
 
-  func removeMarker(_ marker: GMSAdvancedMarker) {
+  func removeMarker(_ marker: GMSMarker) {
     marker.map = nil
   }
 
