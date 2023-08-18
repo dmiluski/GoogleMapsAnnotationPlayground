@@ -18,7 +18,11 @@ class ViewController: UIViewController {
 
   let sydney = CLLocationCoordinate2D(latitude: -33.86, longitude: 151.20)
   var provider = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].makeIterator()
-
+  let region = Region(
+    southwest: CLLocationCoordinate2D(latitude: -41.094738152514914, longitude: 146.91533032804728),
+    southEast: CLLocationCoordinate2D(latitude: -41.094738152514914, longitude: 155.48466760665178),
+    northWest: CLLocationCoordinate2D(latitude: -25.699533074519202, longitude: 146.91533032804728),
+    northEast: CLLocationCoordinate2D(latitude: -25.699533074519202, longitude: 155.48466760665178))
 
   // MARK: - Views
 
@@ -40,6 +44,16 @@ class ViewController: UIViewController {
     let control = UISegmentedControl(frame: .zero, actions: actions)
     control.translatesAutoresizingMaskIntoConstraints = false
     return control
+  }()
+  lazy var slider: UISlider = {
+
+    let action = UIAction(title: "Slider") { [weak self] _ in
+      guard let self else { return }
+      self.didUpdateSlider(self.slider)
+    }
+    let slider = UISlider(frame: .zero, primaryAction: action)
+    slider.translatesAutoresizingMaskIntoConstraints = false
+    return slider
   }()
   lazy var updatingView = UpdatingView()
   var content = UpdatingView.Content()
@@ -130,8 +144,14 @@ class ViewController: UIViewController {
       segmentedControl.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
     ])
 
-    let camera = GMSCameraPosition(target: sydney, zoom: 6.0)
-    mapView.animate(to: camera)
+    view.addSubview(slider)
+    NSLayoutConstraint.activate([
+      slider.bottomAnchor.constraint(equalTo: segmentedControl.topAnchor, constant: -8),
+      slider.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+      slider.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+    ])
+
+    setRegion(region, edgeInsets:  .zero)
   }
 }
 
@@ -251,5 +271,59 @@ extension ViewController {
     marker.map = nil
   }
 
+  public func didUpdateSlider(_ slider: UISlider) {
+
+    // Use Slider position to adjust bottom insets
+    let insets = UIEdgeInsets(
+      top: 0,
+      left: 0,
+      bottom: CGFloat(slider.value) * mapView.frame.size.height,
+      right: 0)
+    setRegion(region, edgeInsets: insets)
+  }
+
+  public func setRegion(_ region: Region, edgeInsets: UIEdgeInsets) {
+    // Convert to Bounds using (Southwest, NorthEast Coordinates)
+    let bounds = GMSCoordinateBounds(coordinate: region.southwest, coordinate: region.northEast)
+
+    // `GMSCameraUpdate.fit` automatically includes `map.padding`,
+    // so we need to subtract out the padding from the given `edgeInsets`.
+    let adjustedInsets = edgeInsets - mapView.padding
+    let cameraUpdate = GMSCameraUpdate.fit(bounds, with: adjustedInsets)
+
+    mapView.moveCamera(cameraUpdate)
+  }
+
 }
 
+struct Region {
+  let southwest: CLLocationCoordinate2D
+  let southEast: CLLocationCoordinate2D
+  let northWest: CLLocationCoordinate2D
+  let northEast: CLLocationCoordinate2D
+}
+
+extension GMSCoordinateBounds {
+  convenience init(_ region: Region) {
+    self.init(coordinate: region.southwest, coordinate: region.northEast)
+  }
+}
+
+extension GMSVisibleRegion {
+  init(_ region: Region) {
+    self.init(
+      nearLeft: region.southwest,
+      nearRight: region.southEast,
+      farLeft: region.northWest,
+      farRight: region.northEast
+    )
+  }
+}
+
+func -(lhs: UIEdgeInsets, rhs: UIEdgeInsets) -> UIEdgeInsets {
+  UIEdgeInsets(
+    top: lhs.top - rhs.top,
+    left: lhs.left - rhs.left,
+    bottom: lhs.bottom - rhs.bottom,
+    right: lhs.right - rhs.right)
+}
