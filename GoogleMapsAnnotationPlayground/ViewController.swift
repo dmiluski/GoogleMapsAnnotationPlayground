@@ -87,10 +87,29 @@ class ViewController: UIViewController {
     return marker
   }()
 
+  lazy var staticMarker: GMSAdvancedMarker = {
+    // Creates a marker in the center of the map.
+    let marker = GMSAdvancedMarker()
+    marker.position = sydney
+    //    marker.groundAnchor = .init(x: 0.5, y: 0.5)
+    marker.title = "Sydney"
+    marker.snippet = "Australia"
+
+    let view = UpdatingView()
+    view.setContent(.init(state: .purple, value: -1))
+    marker.iconView = view
+
+    // Anchor to bottom of marker
+    marker.appearAnimation = .pop
+
+    return marker
+  }()
+
   lazy var addColorChangingView: UIButton = {
     let action = UIAction(title: "Add") { [weak self] _ in
       guard let self = self else { return }
       self.addMarker(self.updatingMarker)
+      self.addMarker(self.staticMarker)
     }
     let button = UIButton(type: .system, primaryAction: action)
     return button
